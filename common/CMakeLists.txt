@@ -1,0 +1,7 @@
+add_library(common_lib STATIC
+    protocol.cpp
+)
+
+target_link_libraries(common_lib Qt6::Core)
+
+target_include_directories(common_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
