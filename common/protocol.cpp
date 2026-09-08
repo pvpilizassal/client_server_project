@@ -10,4 +10,4 @@ QTime stringToTime(const QString& str) {
     return QTime::fromString(str, "HH:mm");
 }
 
-} // namespace Protocol
+}
