@@ -1,3 +1,5 @@
 #include "server_core.h"
 
-server_core::server_core() {}
+ServerCore::ServerCore(QObject *parent)
+    : QObject{parent}
+{}

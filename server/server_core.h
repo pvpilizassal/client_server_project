@@ -3,11 +3,13 @@
 
 #include <QObject>
 
-class server_core
+class ServerCore : public QObject
 {
     Q_OBJECT
 public:
-    server_core();
+    explicit ServerCore(QObject *parent = nullptr);
+
+signals:
 };
 
 #endif // SERVER_CORE_H
