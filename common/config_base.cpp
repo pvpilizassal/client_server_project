@@ -40,7 +40,7 @@ bool ConfigBase::load()
     return true;
 }
 
-bool ConfigBase::save() const
+bool ConfigBase::save() const // добавить сохранение при аварийном завершении
 {
     QSaveFile file(m_filePath);
     // создается каталог, если его нет

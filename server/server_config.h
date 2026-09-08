@@ -45,10 +45,10 @@ private:
     static const QString PORT_KEY;
     static const QString TIME_KEY;
 
-    // метод для проверки и коррекции порта
+    // ?метод для проверки и коррекции порта?
     static quint16 fixPort(int value);
 
-    // метод для проверки и коррекции времени
+    // ?метод для проверки и коррекции времени?
     static quint32 fixTime(int value);
 };
 
