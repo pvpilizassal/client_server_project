@@ -14,14 +14,14 @@ class ServerCore : public QObject
 {
     Q_OBJECT
 public:
-    ServerCore(QObject *parent = nullptr); // в конструкторе отводим ресурс под сокет
+    explicit ServerCore(QObject *parent = nullptr); // в конструкторе отводим ресурс под сокет
     ~ServerCore(); // в деструкторе отвобождается сокет и флаги ставятся в фолз
 
     bool start(quint16 port); // запускаем сервер
     void stop(); // останавливаем сервер
     bool isRunning() const; // проверка, запущен ли вервер
 
-    void sendTime(quint32 seconds); // отправка времени с сервера клиенту
+    void sendTime(quint32 seconds); // отправка времени с сервера клиенту, quint32 - 4 байта
     qint64 timeSinceLastPacket() const; // сколько времени прошло с последнего пинга от клиента (должно быть < 3 сек)
     bool isClientAlive() const; // жив ли клиент
 
@@ -32,9 +32,9 @@ private slots:
     void onReadyRead(); // обработка пакета от клиента
 
 private:
-    std::unique_ptr<QUdpSocket> m_socket; // сокет
+    std::unique_ptr<QUdpSocket> m_socket; // хранится дескриптор сокета, кот-й ОС исп-т для идентификации
     QHostAddress m_clientAddress; // айпи адрес клиента
-    quint16 m_clientPort = 0; // порт клиента
+    quint16 m_clientPort = 0; // порт клиента, quint16 - 2 байта
     QElapsedTimer m_lastPacketTimer; // таймер с последнего пинга от клиента
     bool m_clientAlive = false; // статус жизни клиента
     bool m_running = false; // статус, поднят сервер или нет
