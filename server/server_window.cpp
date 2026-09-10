@@ -155,18 +155,16 @@ void ServerWindow::setupTimer()
 
 void ServerWindow::loadConfig()
 {
-    if (!m_config->load()) {
+    if (!m_config->load())
         qWarning() << "ServerWindow failed to load config, using defaults";
-    }
 }
 
 void ServerWindow::saveConfig()
 {
     // сохраняем последнее время в конфиг
     m_config->setTime(m_currentTime);
-    if (!m_config->save()) {
+    if (!m_config->save())
         qWarning() << "ServerWindow failed to save config";
-    }
 }
 
 void ServerWindow::onTimerTick()
@@ -181,13 +179,11 @@ void ServerWindow::onTimerTick()
     }
 
     // отправляем время Клиенту
-    const quint32 secondsFromMidnight =
-        static_cast<quint32>(QTime(0, 0, 0).secsTo(m_currentTime));
+    const quint32 secondsFromMidnight = static_cast<quint32>(QTime(0, 0, 0).secsTo(m_currentTime));
     m_core->sendTime(secondsFromMidnight);
 
     // проверяем актуальность клиента по таймауту
-    const bool aliveNow =
-        (m_core->timeSinceLastPacket() < Protocol::CLIENT_ALIVE_TIMEOUT_MS);
+    const bool aliveNow = (m_core->timeSinceLastPacket() < Protocol::CLIENT_ALIVE_TIMEOUT_MS);
 
     if (aliveNow != m_clientAlive) {
         m_clientAlive = aliveNow;
@@ -207,8 +203,7 @@ void ServerWindow::onTimeChanged(const QTime& newTime)
         return;
     }
     m_currentTime = newTime;
-    qDebug() << "ServerWindow user set time to"
-             << newTime.toString(QStringLiteral("HH:mm"));
+    qDebug() << "ServerWindow user set time to" << newTime.toString(QStringLiteral("HH:mm"));
 }
 
 void ServerWindow::updateTimeDisplay(const QTime& time)
