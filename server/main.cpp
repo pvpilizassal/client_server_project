@@ -6,7 +6,11 @@
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
-    QMainWindow w;
+
+    QCoreApplication::setOrganizationName(QStringLiteral("TestTask"));
+    QCoreApplication::setApplicationName(QStringLiteral("TimeServer"));
+
+    ServerWindow w;
     w.show();
     return app.exec();
 }

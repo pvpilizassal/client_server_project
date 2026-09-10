@@ -15,7 +15,7 @@ class ServerCore : public QObject
     Q_OBJECT
 public:
     explicit ServerCore(QObject *parent = nullptr); // в конструкторе отводим ресурс под сокет
-    ~ServerCore(); // в деструкторе отвобождается сокет и флаги ставятся в фолз
+    ~ServerCore() override; // в деструкторе отвобождается сокет и флаги ставятся в фолз
 
     bool start(quint16 port); // запускаем сервер
     void stop(); // останавливаем сервер

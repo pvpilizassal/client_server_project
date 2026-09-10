@@ -8,6 +8,7 @@
 #include <QSaveFile>
 #include <QDir>
 #include <QDebug>
+#include <QStandardPaths>
 
 /**
  * @brief Абстрактный базовый класс для управления конфигурацией в JSON-файле
@@ -59,6 +60,8 @@ public:
      * Может быть использован наследниками при массовом изменении
      */
     void setJson(const QJsonObject& json);
+
+    static QString defaultConfigPath(const QString& fileName);
 
 protected:
     /**
