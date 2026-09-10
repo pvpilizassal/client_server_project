@@ -12,15 +12,24 @@ ServerConfig::ServerConfig(const QString& filePath)
 
 quint16 ServerConfig::getPort() const
 {
-    // если поле отсутствует или не int, вернется 0
-    int value = m_json.value(PORT_KEY).toInt(0);
-    return static_cast<quint16>(qBound(1, value, 65535)); // если 0, то 1
+    // если поле отсутствует или не int, вернется дефолтный порт 12345
+    int value = m_json.value(PORT_KEY).toInt(Protocol::DEFAULT_PORT);
+    return static_cast<quint16>(qBound(1, value, 65535));
 }
 
 void ServerConfig::setPort(quint16 port)
 {
     m_json[PORT_KEY] = static_cast<int>(port);
     // после изменения поля можно повторно вызвать validateAndFix для проверки
+}
+
+QString ServerConfig::defaultPath()
+{
+    // Linux ~/.config/<OrgName>/<AppName>/
+    // Windows	C:/Users/<User>/AppData/Local/<OrgName>/<AppName>/
+    const QString dir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    qDebug() << dir;
+    return dir + QStringLiteral("/server_config.json");
 }
 
 quint32 ServerConfig::getTimeSeconds() const

@@ -41,6 +41,14 @@ void ClientConfig::setServerPort(quint16 port)
     m_json[PORT_KEY] = static_cast<int>(port);
 }
 
+QString ClientConfig::defaultPath()
+{
+    // Linux ~/.config/<OrgName>/<AppName>/
+    // Windows	C:/Users/<User>/AppData/Local/<OrgName>/<AppName>/
+    const QString dir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    return dir + QStringLiteral("/client_config.json");
+}
+
 bool ClientConfig::isServerAddressValid() const
 {
     return isValidAddress(getServerAddress());

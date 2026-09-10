@@ -29,6 +29,8 @@ public:
     quint16 getServerPort() const;
     void setServerPort(quint16 port);
 
+    static QString defaultPath();
+
     // дополнительный метод для проверки валидности адреса
     bool isServerAddressValid() const;
 
