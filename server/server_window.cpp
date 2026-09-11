@@ -25,7 +25,7 @@ ServerWindow::ServerWindow(QWidget *parent)
 
     loadConfig(); // читаем json, заполняем поля m_config
 
-    const quint16 port = m_config->getPort(); // вытаскиваем из json порт Клиента (один раз? а если первым запустится сервер, а не клиент)
+    const quint16 port = m_config->getPort(); // вытаскиваем из json порт
     if (!m_core->start(port)) { // подключаем сокет к порту на любом интерфейсе
         QMessageBox::critical(
             this,
@@ -40,10 +40,7 @@ ServerWindow::ServerWindow(QWidget *parent)
     m_timer->start(); // запуск таймера
 
     setWindowTitle(tr("Сервер времени"));
-    // снять фокус кликом по полю окна
-    centralWidget()->installEventFilter(this);
-    // снять фокус нажатием на enter
-    m_timeEdit->installEventFilter(this);
+
     resize(300, 100);
 }
 
@@ -56,7 +53,7 @@ ServerWindow::~ServerWindow()
 void ServerWindow::closeEvent(QCloseEvent *event)
 {
     // сохранение и остановка выполняются в деструкторе — здесь только
-    // подтверждаем закрытие, это исключает дублирование логики.
+    // подтверждаем закрытие, это исключает дублирование логики
     event->accept();
 }
 
@@ -90,6 +87,7 @@ bool ServerWindow::eventFilter(QObject *watched, QEvent *event)
 void ServerWindow::setupUi()
 {
     auto* central = new QWidget(this);
+    central->setFocusPolicy(Qt::StrongFocus);
     setCentralWidget(central);
 
     auto* mainLayout = new QVBoxLayout(central);
@@ -131,25 +129,21 @@ void ServerWindow::setupUi()
     // окно подгоняется под содержимое
     adjustSize();
     setMinimumSize(sizeHint());
+    // снять фокус кликом по полю окна
+    centralWidget()->installEventFilter(this);
+    // снять фокус нажатием на enter
+    m_timeEdit->installEventFilter(this);
 }
 
 void ServerWindow::setupConnections()
 {
-    connect(m_timeEdit, &QTimeEdit::timeChanged,
-            this,       &ServerWindow::onTimeChanged);
-
-    // сигнал от ядра используем только для отладочного лога —
-    // истина о статусе вычисляется по таймауту в onTimerTick().
-    connect(m_core.get(), &ServerCore::clientAliveChanged,
-            this, [](bool alive) {
-                qDebug() << "ServerCore client alive signal:" << alive;
-            });
+    connect(m_timeEdit, &QTimeEdit::timeChanged, this, &ServerWindow::onTimeChanged);
 }
 
 void ServerWindow::setupTimer()
 {
     m_timer = new QTimer(this);
-    m_timer->setInterval(Protocol::TICK_INTERVAL_MS);
+    m_timer->setInterval(Protocol::TICK_INTERVAL_MS); // минимальный интервал
     connect(m_timer, &QTimer::timeout, this, &ServerWindow::onTimerTick);
 }
 
@@ -178,7 +172,7 @@ void ServerWindow::onTimerTick()
         updateTimeDisplay(m_currentTime);
     }
 
-    // отправляем время Клиенту
+    // отправляем время Клиенту (считая секунды от 00:00:00 до m_currentTime)
     const quint32 secondsFromMidnight = static_cast<quint32>(QTime(0, 0, 0).secsTo(m_currentTime));
     m_core->sendTime(secondsFromMidnight);
 
