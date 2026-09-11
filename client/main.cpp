@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setOrganizationName(QStringLiteral("TestTask"));
     QCoreApplication::setApplicationName(QStringLiteral("TimeClient"));
 
-    QMainWindow w;
+    ClientWindow w;
     w.show();
     return app.exec();
 }

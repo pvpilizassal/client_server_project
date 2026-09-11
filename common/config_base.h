@@ -10,32 +10,16 @@
 #include <QDebug>
 #include <QStandardPaths>
 
-/**
- * @brief Абстрактный базовый класс для управления конфигурацией в JSON-файле
- *
- * Предоставляет общую логику загрузки/сохранения из/в файл, а также
- * работу с дефолтными значениями через чисто виртуальный метод getDefaults()
- */
 class ConfigBase
 {
 public:
-    /**
-     * @param filePath - полный путь к JSON-файлу конфигурации
-     */
-    explicit ConfigBase(const QString& filePath);
+    explicit ConfigBase(const QString& filePath); // пустой путь: = QString() мб стоит обработать ??
     virtual ~ConfigBase() = default;
 
-    // запрет на копирование
+    // запрет на копирование (просто ради дизайна)
     ConfigBase(const ConfigBase&) = delete;
     ConfigBase& operator=(const ConfigBase&) = delete;
 
-    /**
-     * @brief Загружает конфигурацию из файла
-     * Если файл отсутствует или повреждён, устанавливаются значения по умолчанию
-     * (вызовом setDefaults()).
-     * @return true, если загрузка прошла успешно (или установлены дефолты),
-     *         false при критической ошибке (например, файл есть, но не читается)
-     */
     bool load();
 
     /**
