@@ -112,6 +112,9 @@ void ServerWindow::setupUi()
     mainLayout->setContentsMargins(6, 1, 6, 1);
     mainLayout->setSpacing(2);
 
+    QFont statusFont = font();
+    statusFont.setPointSize(statusFont.pointSize() + 2);
+
     m_timeEdit = new QTimeEdit(this);
     m_timeEdit->setDisplayFormat(QStringLiteral("HH:mm"));
     m_timeEdit->setWrapping(true); // цикличность времени
@@ -120,18 +123,22 @@ void ServerWindow::setupUi()
     // (Enter, потеря фокуса, клик по стрелкам), а не на каждый символ
     m_timeEdit->setKeyboardTracking(false);
     m_timeEdit->setAlignment(Qt::AlignCenter);
-    m_timeEdit->setMinimumWidth(100);
+    m_timeEdit->setMinimumWidth(150);
     m_timeEdit->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    m_timeEdit->setFont(statusFont);
 
     m_statusLabel = new QLabel(this);
     m_statusLabel->setAlignment(Qt::AlignCenter);
 
     auto* statusRow = new QHBoxLayout;
+    auto* statusCaption = new QLabel(tr("Клиент видит время - "), this);
 
     // статус клиента
     statusRow->setContentsMargins(0, 0, 0, 0);
     statusRow->addStretch();
-    statusRow->addWidget(new QLabel(tr("Клиент видит время - "), this));
+    statusCaption->setFont(statusFont);
+    m_statusLabel->setFont(statusFont);
+    statusRow->addWidget(statusCaption);
     statusRow->addWidget(m_statusLabel);
     statusRow->addStretch();
 
@@ -168,6 +175,10 @@ void ServerWindow::setupTimer()
 void ServerWindow::loadConfig()
 {
     const ConfigLoadResult res = m_config->load();
+
+    // первый запуск
+    if (res.status == ConfigLoadResult::Status::FileNotFound)
+        return;
 
     if (!res.isWarning())
         return;
@@ -239,5 +250,5 @@ void ServerWindow::updateTimeDisplay(const QTime& time)
 void ServerWindow::updateClientStatusLabel(bool alive)
 {
     if (alive) m_statusLabel->setText(tr("Да"));
-    else       m_statusLabel->setText(tr("Нет"));
+    else m_statusLabel->setText(tr("Нет"));
 }

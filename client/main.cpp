@@ -1,6 +1,5 @@
 #include <QApplication>
 #include "client_window.h"
-#include "client_config.h"
 #include <QStandardPaths>
 #include <QDir>
 

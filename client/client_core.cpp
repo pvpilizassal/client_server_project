@@ -102,7 +102,7 @@ void ClientCore::onReadyRead()
         buffer.resize(m_socket->pendingDatagramSize());
 
         QHostAddress senderAddress;
-        quint16      senderPort = 0;
+        quint16 senderPort = 0;
 
         const qint64 read = m_socket->readDatagram(buffer.data(),
                      buffer.size(), &senderAddress, &senderPort);
