@@ -12,6 +12,7 @@
 #include <QTimeEdit>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QWarningMessage>
 
 ServerWindow::ServerWindow(QWidget *parent)
     : QMainWindow(parent) // вызов конструктора базового класса
@@ -149,8 +150,10 @@ void ServerWindow::setupTimer()
 
 void ServerWindow::loadConfig()
 {
-    if (!m_config->load())
+    if (!m_config->load()) {
+        QWarningMessage
         qWarning() << "ServerWindow failed to load config, using defaults";
+    }
 }
 
 void ServerWindow::saveConfig()

@@ -10,6 +10,24 @@
 #include <QDebug>
 #include <QStandardPaths>
 
+struct ConfigLoadResult
+{
+    enum class Status {
+        Ok,                  // файл прочитан и распарсен
+        FileNotFound,        // файла нет — первый запуск, применены дефолты
+        OpenFailed,          // файл есть, но не открылся (права и т.п.)
+        ParseError,          // битый JSON
+        NotAnObject,         // валидный JSON, но не объект
+        ValidationFixed      // загружен, но валидация что-то поправила
+    };
+
+    Status  status = Status::Ok;
+    QString message;         // описание для UI
+
+    bool isOk()      const { return status == Status::Ok; }
+    bool isWarning() const { return status != Status::Ok; }
+};
+
 class ConfigBase
 {
 public:
@@ -21,28 +39,10 @@ public:
     ConfigBase& operator=(const ConfigBase&) = delete;
 
     bool load();
-
-    /**
-     * @brief Сохраняет текущую конфигурацию в файл
-     * @return true в случае успеха, иначе false
-     */
     bool save() const;
-
-    /**
-     * @brief Устанавливает значения по умолчанию (вызывая getDefaults())
-     */
     void setDefaults();
 
-    /**
-     * @brief Возвращает текущий JSON-объект конфигурации
-     * Используется наследниками для доступа к параметрам
-     */
     QJsonObject getJson() const;
-
-    /**
-     * @brief Защищённый метод для обновления всего JSON-объекта
-     * Может быть использован наследниками при массовом изменении
-     */
     void setJson(const QJsonObject& json);
 
     static QString defaultConfigPath(const QString& fileName);
@@ -65,7 +65,7 @@ protected:
     QJsonObject m_json;      ///< Хранит все параметры конфигурации
 
 private:
-    QString m_filePath;      ///< Путь к файлу конфигурации
+    QString m_filePath;
 };
 
 #endif // CONFIG_BASE_H

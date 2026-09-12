@@ -2,13 +2,13 @@
 #define CLIENT_WINDOW_H
 
 #include <QMainWindow>
-#include <AnalogClock>
+//#include <AnalogClock>
 
-class client_window : public QMainWindow
+class ClientWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit client_window(QWidget *parent = nullptr);
+    explicit ClientWindow(QWidget *parent = nullptr);
 
 
 signals:

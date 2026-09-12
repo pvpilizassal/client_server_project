@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-class analogclock
+class analogclock : QWidget
 {
     Q_OBJECT
 public:

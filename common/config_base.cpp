@@ -8,25 +8,27 @@ ConfigBase::ConfigBase(const QString& filePath)
 bool ConfigBase::load()
 {
     QFile file(m_filePath);
+
+    // первый запуск, если файла не существовало - в настройки ставятся дефолты (разные)
     if (!file.exists()) {
-        // файла нет – устанавливаются дефолты, но не сохраняются (позжн)
-        setDefaults();
         qDebug() << "Config file not found, using defaults. Path:" << m_filePath;
-        return true; // первый запуск
+        setDefaults();
+        return true;
     }
 
     if (!file.open(QIODevice::ReadOnly)) {
         qWarning() << "Failed to open config file for reading:" << m_filePath;
-        return false;
+        setDefaults();
+        return true;
     }
 
     QJsonParseError parseError;
     QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &parseError);
     if (parseError.error != QJsonParseError::NoError) {
         qWarning() << "Failed to parse JSON config file:" << parseError.errorString();
-        // при повреждении файла устанавливаются дефолты
+        // при повреждении файла устанавливаются дефолты, что делать со старым файлом?
         setDefaults();
-        return true; // перезаписывается при сохранении
+        return true;
     }
 
     if (!doc.isObject()) {
@@ -36,7 +38,7 @@ bool ConfigBase::load()
     }
 
     m_json = doc.object();
-    validateAndFix(); // валидацию после загрузки
+    validateAndFix(); // валидация после загрузки
     return true;
 }
 
