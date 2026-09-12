@@ -4,19 +4,6 @@
 #include "../common/config_base.h"
 #include <QHostAddress>
 
-/**
- * @brief Конфигурация клиента
- *
- * Поля:
- * - serverAddress (QString) : IP-адрес или доменное имя сервера
- * - serverPort (quint16)    : UDP-порт сервера
- *
- * Пример JSON:
- * {
- *   "serverAddress": "127.0.0.1",
- *   "serverPort": 12345
- * }
- */
 class ClientConfig : public ConfigBase
 {
 public:

@@ -5,19 +5,6 @@
 #include "../common/protocol.h"
 #include <QTime>
 
-/**
- * @brief Конфигурация сервера
- *
- * Поля:
- * - port (quint16)    : UDP-порт для приёма соединений
- * - time (quint32)    : текущее время в секундах от полуночи [0..86399]
- *
- * Хранится в JSON-файле, например:
- * {
- *   "port": 12345,
- *   "time": 43200
- * }
- */
 class ServerConfig : public ConfigBase
 {
 public:

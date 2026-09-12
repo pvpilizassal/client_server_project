@@ -12,7 +12,6 @@
 #include <QTimeEdit>
 #include <QTimer>
 #include <QVBoxLayout>
-#include <QWarningMessage>
 
 ServerWindow::ServerWindow(QWidget *parent)
     : QMainWindow(parent) // вызов конструктора базового класса
@@ -47,15 +46,33 @@ ServerWindow::ServerWindow(QWidget *parent)
 
 ServerWindow::~ServerWindow()
 {
-    saveConfig();
+    // saveConfig();
     m_core->stop();
 }
 
 void ServerWindow::closeEvent(QCloseEvent *event)
 {
-    // сохранение и остановка выполняются в деструкторе — здесь только
-    // подтверждаем закрытие, это исключает дублирование логики
-    event->accept();
+    m_config->setTime(m_currentTime);
+    const ConfigSaveResult res = m_config->save();
+
+    if (res.isOk()) {
+        event->accept();
+        return;
+    }
+
+    // если не получилось сохранить файл настроек — говорим пользователю и даём выбор
+    const auto answer = QMessageBox::warning(
+        this,
+        tr("Сохранение настроек"),
+        tr("Не удалось сохранить настройки при закрытии.\n\n%1\n\n"
+           "Закрыть приложение без сохранения?").arg(res.message),
+        QMessageBox::Yes | QMessageBox::No,
+        QMessageBox::No);   // дефолт — No
+
+    if (answer == QMessageBox::Yes)
+        event->accept();
+    else
+        event->ignore();    // окно остаётся открытым
 }
 
 bool ServerWindow::eventFilter(QObject *watched, QEvent *event)
@@ -150,19 +167,28 @@ void ServerWindow::setupTimer()
 
 void ServerWindow::loadConfig()
 {
-    if (!m_config->load()) {
-        QWarningMessage
-        qWarning() << "ServerWindow failed to load config, using defaults";
-    }
+    const ConfigLoadResult res = m_config->load();
+
+    if (!res.isWarning())
+        return;
+
+    // откладываем показ до момента, когда окно уже будет показано
+    const QString msg = res.message;
+    QTimer::singleShot(0, this, [this, msg] {
+        QMessageBox::warning(
+            this,
+            tr("Конфигурация"),
+            tr("%1\nИспользованы значения по умолчанию.").arg(msg));
+    });
 }
 
-void ServerWindow::saveConfig()
-{
-    // сохраняем последнее время в конфиг
-    m_config->setTime(m_currentTime);
-    if (!m_config->save())
-        qWarning() << "ServerWindow failed to save config";
-}
+// void ServerWindow::saveConfig()
+// {
+//     // сохраняем последнее время в конфиг
+//     m_config->setTime(m_currentTime);
+//     if (!m_config->save())
+//         qWarning() << "ServerWindow failed to save config";
+// }
 
 void ServerWindow::onTimerTick()
 {

@@ -28,6 +28,23 @@ struct ConfigLoadResult
     bool isWarning() const { return status != Status::Ok; }
 };
 
+struct ConfigSaveResult
+{
+    enum class Status {
+        Ok,
+        DirCreateFailed,   // не удалось создать каталог
+        OpenFailed,        // файл не открылся (права, read-only, антивирус)
+        WriteFailed,       // ошибка записи (диск переполнен, обрыв)
+        CommitFailed       // атомарный rename не прошёл
+    };
+
+    Status  status = Status::Ok;
+    QString message;       // описание для UI
+
+    bool isOk()      const { return status == Status::Ok; }
+    bool isWarning() const { return status != Status::Ok; }
+};
+
 class ConfigBase
 {
 public:
@@ -38,8 +55,8 @@ public:
     ConfigBase(const ConfigBase&) = delete;
     ConfigBase& operator=(const ConfigBase&) = delete;
 
-    bool load();
-    bool save() const;
+    ConfigLoadResult load();
+    ConfigSaveResult save() const;
     void setDefaults();
 
     QJsonObject getJson() const;
@@ -48,21 +65,10 @@ public:
     static QString defaultConfigPath(const QString& fileName);
 
 protected:
-    /**
-     * @brief Чисто виртуальный метод, который должен вернуть объект
-     * с дефолтными настройками для конкретного приложения
-     * @return QJsonObject с полями и значениями по умолчанию
-     */
     virtual QJsonObject getDefaults() const = 0;
-
-    /**
-     * @brief Валидация и корректировка значений после загрузки
-     * По умолчанию ничего не делает. Наследники могут переопределить
-     * для проверки типов, диапазонов и взаимосвязей полей
-     */
     virtual void validateAndFix() = 0;
 
-    QJsonObject m_json;      ///< Хранит все параметры конфигурации
+    QJsonObject m_json; // хранит параметры конфигурации
 
 private:
     QString m_filePath;

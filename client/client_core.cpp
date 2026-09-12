@@ -30,12 +30,12 @@ bool ClientCore::start(const QHostAddress& serverAddress, quint16 serverPort)
     }
 
     m_serverAddress = serverAddress;
-    m_serverPort    = serverPort;
+    m_serverPort = serverPort;
 
 
-    m_running        = true;
-    m_dataFresh      = false;
-    m_lastPacketTimer.start();   // «нулевой» отсчёт до первого пакета
+    m_running = true;
+    m_dataFresh = false;
+    m_lastPacketTimer.start(); // «нулевой» отсчёт до первого пакета
 
     emit dataFreshnessChanged(false);
 
@@ -51,7 +51,7 @@ void ClientCore::stop()
     }
 
     m_socket->close();
-    m_running   = false;
+    m_running = false;
     m_dataFresh = false;
 
     emit dataFreshnessChanged(false);
@@ -63,7 +63,6 @@ bool ClientCore::isRunning() const
 {
     return m_running;
 }
-
 
 void ClientCore::sendAlive()
 {
@@ -106,9 +105,7 @@ void ClientCore::onReadyRead()
         quint16      senderPort = 0;
 
         const qint64 read = m_socket->readDatagram(buffer.data(),
-                                                   buffer.size(),
-                                                   &senderAddress,
-                                                   &senderPort);
+                     buffer.size(), &senderAddress, &senderPort);
         if (read == -1) {
             qWarning() << "Failed to read datagram:" << m_socket->errorString();
             continue;
@@ -122,7 +119,7 @@ void ClientCore::onReadyRead()
             continue;
         }
 
-        // Ожидаем ровно 4 байта (quint32 BigEndian).
+        // ожидаем ровно 4 байта (quint32 BigEndian).
         if (buffer.size() != static_cast<int>(sizeof(quint32))) {
             qDebug() << "Ignoring datagram of unexpected size"
                      << buffer.size();

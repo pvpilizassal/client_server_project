@@ -5,7 +5,7 @@ ConfigBase::ConfigBase(const QString& filePath)
 {
 }
 
-bool ConfigBase::load()
+ConfigLoadResult ConfigBase::load()
 {
     QFile file(m_filePath);
 
@@ -13,13 +13,15 @@ bool ConfigBase::load()
     if (!file.exists()) {
         qDebug() << "Config file not found, using defaults. Path:" << m_filePath;
         setDefaults();
-        return true;
+        return { ConfigLoadResult::Status::FileNotFound,
+                 QString("Файл конфигурации не найден.") };
     }
 
     if (!file.open(QIODevice::ReadOnly)) {
         qWarning() << "Failed to open config file for reading:" << m_filePath;
         setDefaults();
-        return true;
+        return { ConfigLoadResult::Status::OpenFailed,
+                 QString("Не удалось открыть файл конфигурации: %1").arg(file.errorString()) };
     }
 
     QJsonParseError parseError;
@@ -28,49 +30,57 @@ bool ConfigBase::load()
         qWarning() << "Failed to parse JSON config file:" << parseError.errorString();
         // при повреждении файла устанавливаются дефолты, что делать со старым файлом?
         setDefaults();
-        return true;
+        return { ConfigLoadResult::Status::ParseError,
+                 QString("Файл конфигурации повреждён (JSON-ошибка на позиции %1): %2")
+                    .arg(parseError.offset).arg(parseError.errorString()) };
     }
 
     if (!doc.isObject()) {
         qWarning() << "Config file does not contain a JSON object.";
         setDefaults();
-        return true;
+        return { ConfigLoadResult::Status::NotAnObject,
+                QString("Файл конфигурации не содержит JSON-объект.") };
     }
 
     m_json = doc.object();
     validateAndFix(); // валидация после загрузки
-    return true;
+    return { ConfigLoadResult::Status::Ok, {} };
 }
 
-bool ConfigBase::save() const // добавить сохранение при аварийном завершении
+ConfigSaveResult ConfigBase::save() const // добавить сохранение при аварийном завершении
 {
     QSaveFile file(m_filePath);
     // создается каталог, если его нет
-    QDir dir = QFileInfo(file).absoluteDir();
-    if (!dir.exists()) {
-        if (!dir.mkpath(".")) {
-            qWarning() << "Failed to create config directory:" << dir.absolutePath();
-            return false;
-        }
+    const QDir dir = QFileInfo(file).absoluteDir();
+    if (!dir.exists() && !dir.mkpath(".")) {
+        qWarning() << "Failed to create config directory:" << dir.absolutePath();
+        return { ConfigSaveResult::Status::DirCreateFailed,
+                QString("Не удалось создать каталог: %1").arg(dir.absolutePath()) };
     }
 
+    // создает временный файл
     if (!file.open(QIODevice::WriteOnly)) {
-        qWarning() << "Failed to open config file for writing:" << m_filePath;
-        return false;
+        qWarning() << "Failed to open config file for writing:" << m_filePath << file.errorString();
+        return { ConfigSaveResult::Status::OpenFailed,
+                QString("Не удалось открыть файл для записи: %1").arg(file.errorString()) };
     }
 
+    // пишет во временный файл
     QJsonDocument doc(m_json);
     if (file.write(doc.toJson()) == -1) {
-        qWarning() << "Failed to write config file:" << m_filePath;
-        return false;
+        qWarning() << "Failed to write config file:" << m_filePath << file.errorString();
+        return { ConfigSaveResult::Status::WriteFailed,
+                QString("Не удалось записать файл: %1").arg(file.errorString()) };
     }
 
+    // атомарно переименовывает временный файл в рабочий, иначе удаляет временный
     if (!file.commit()) {
-        qWarning() << "Failed to commit config file (atomic rename failed)";
-        return false;
+        qWarning() << "Failed to commit config file (atomic rename failed)" << file.errorString();
+        return { ConfigSaveResult::Status::CommitFailed,
+                QString("Не удалось атомарно заменить файл: %1").arg(file.errorString()) };
     }
 
-    return true;
+    return {};
 }
 
 void ConfigBase::setDefaults()
