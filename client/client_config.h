@@ -6,6 +6,11 @@
 
 class ClientConfig : public ConfigBase
 {
+    static inline const QString ADDRESS_KEY = QStringLiteral("serverAddress");
+    static inline const QString PORT_KEY    = QStringLiteral("serverPort");
+    static inline const QString DEFAULT_ADDRESS = QStringLiteral("127.0.0.1");
+    static inline constexpr quint16 DEFAULT_PORT = 12345;
+
 public:
     explicit ClientConfig(const QString& filePath);
 
@@ -18,17 +23,11 @@ public:
 
     static QString defaultPath();
 
-    // дополнительный метод для проверки валидности адреса
-    bool isServerAddressValid() const;
-
 protected:
     QJsonObject getDefaults() const override;
     void validateAndFix() override;
 
 private:
-    static const QString ADDRESS_KEY;
-    static const QString PORT_KEY;
-
     // вспомогательный метод для проверки строки адреса (может быть использован в validateAndFix)
     static bool isValidAddress(const QString& address);
 };

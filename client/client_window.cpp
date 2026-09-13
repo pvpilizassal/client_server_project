@@ -25,7 +25,6 @@ ClientWindow::ClientWindow(QWidget *parent)
     setupTimer();
 
     loadConfig();
-    // applyConfigToUi();
     startCore();
 
     m_timer->start();
@@ -36,7 +35,6 @@ ClientWindow::ClientWindow(QWidget *parent)
 
 ClientWindow::~ClientWindow()
 {
-    // saveConfig();
     m_core->stop();
 }
 
@@ -83,25 +81,6 @@ void ClientWindow::saveConfig()
 
 void ClientWindow::setupUi()
 {
-    // auto* central = new QWidget(this);
-    // setCentralWidget(central);
-
-    // auto* mainLayout = new QVBoxLayout(central);
-    // mainLayout->setContentsMargins(12, 12, 12, 12);
-    // mainLayout->setSpacing(12);
-
-    // m_clock = new AnalogClock(this);
-    // mainLayout->addWidget(m_clock, 1);
-
-    // m_freshnessLabel = new QLabel(this);
-    // m_freshnessLabel->setAlignment(Qt::AlignCenter);
-    // QFont statusFont = m_freshnessLabel->font();
-    // statusFont.setPointSize(statusFont.pointSize() + 2);
-    // m_freshnessLabel->setFont(statusFont);
-    // mainLayout->addWidget(m_freshnessLabel);
-
-    // updateServerStatusLabel(false);
-
     auto* central = new QWidget(this);
     setCentralWidget(central);
 
@@ -139,8 +118,6 @@ void ClientWindow::setupUi()
 void ClientWindow::setupConnections()
 {
     connect(m_core.get(), &ClientCore::timeReceived, this, &ClientWindow::onTimeReceived);
-    connect(m_addressEdit, &QLineEdit::editingFinished, this, &ClientWindow::onServerSettingsChanged);
-    connect(m_portSpin, &QSpinBox::editingFinished, this, &ClientWindow::onServerSettingsChanged);
 }
 
 void ClientWindow::setupTimer()
@@ -148,13 +125,6 @@ void ClientWindow::setupTimer()
     m_timer = new QTimer(this);
     m_timer->setInterval(Protocol::TICK_INTERVAL_MS);
     connect(m_timer, &QTimer::timeout, this, &ClientWindow::onTimerTick);
-}
-
-
-void ClientWindow::applyConfigToUi()
-{
-    m_addressEdit->setText(m_config->getServerAddress());
-    m_portSpin->setValue(m_config->getServerPort());
 }
 
 void ClientWindow::startCore()
@@ -200,25 +170,6 @@ void ClientWindow::onTimeReceived(quint32 secondsFromMidnight)
     m_clock->setTime(time);
 
     qDebug() << "ClientWindow time updated:" << time.toString(QStringLiteral("HH:mm"));
-}
-
-void ClientWindow::onServerSettingsChanged()
-{
-    const QString newAddress = m_addressEdit->text().trimmed();
-    const quint16 newPort = static_cast<quint16>(m_portSpin->value());
-
-    if (newAddress == m_config->getServerAddress() &&
-        newPort == m_config->getServerPort()) {
-        return;
-    }
-
-    m_config->setServerAddress(newAddress);
-    m_config->setServerPort(newPort);
-
-    qDebug() << "ClientWindow server settings changed to" << newAddress << ":" << newPort;
-
-    restartCore();
-    saveConfig();
 }
 
 void ClientWindow::updateServerStatusLabel(bool fresh)

@@ -8,8 +8,7 @@ ClientCore::ClientCore(QObject *parent)
     : QObject(parent)
     , m_socket(std::make_unique<QUdpSocket>())
 {
-    connect(m_socket.get(), &QUdpSocket::readyRead,
-            this, &ClientCore::onReadyRead);
+    connect(m_socket.get(), &QUdpSocket::readyRead, this, &ClientCore::onReadyRead);
 }
 
 ClientCore::~ClientCore()
@@ -72,18 +71,17 @@ void ClientCore::sendAlive()
     }
 
     const QByteArray datagram = Protocol::ALIVE_COMMAND.toUtf8();
-    const qint64 sent = m_socket->writeDatagram(datagram,
-                                                m_serverAddress,
-                                                m_serverPort);
+    const qint64 sent = m_socket->writeDatagram(datagram, m_serverAddress, m_serverPort);
     if (sent == -1) {
         qWarning() << "Failed to send ALIVE:" << m_socket->errorString();
-    }
+    } else {
+    qDebug() << "Sent datagram" << Protocol::ALIVE_COMMAND.toStdString() << "to" << m_serverAddress.toString() << ":" << m_serverPort;
+}
 }
 
 
 qint64 ClientCore::timeSinceLastPacket() const
 {
-
     if (!m_dataFresh) {
         return std::numeric_limits<qint64>::max();
     }
@@ -97,6 +95,7 @@ bool ClientCore::isDataFresh() const
 
 void ClientCore::onReadyRead()
 {
+    // возвращает true, если есть хотя бы одна датаграмма, ожидающая обработки
     while (m_socket->hasPendingDatagrams()) {
         QByteArray buffer;
         buffer.resize(m_socket->pendingDatagramSize());
@@ -104,8 +103,7 @@ void ClientCore::onReadyRead()
         QHostAddress senderAddress;
         quint16 senderPort = 0;
 
-        const qint64 read = m_socket->readDatagram(buffer.data(),
-                     buffer.size(), &senderAddress, &senderPort);
+        const qint64 read = m_socket->readDatagram(buffer.data(), buffer.size(), &senderAddress, &senderPort);
         if (read == -1) {
             qWarning() << "Failed to read datagram:" << m_socket->errorString();
             continue;
@@ -114,15 +112,13 @@ void ClientCore::onReadyRead()
 
 
         if (senderPort != m_serverPort) {
-            qDebug() << "Ignoring datagram from unexpected port"
-                     << senderPort;
+            qDebug() << "Ignoring datagram from unexpected port" << senderPort;
             continue;
         }
 
         // ожидаем ровно 4 байта (quint32 BigEndian).
         if (buffer.size() != static_cast<int>(sizeof(quint32))) {
-            qDebug() << "Ignoring datagram of unexpected size"
-                     << buffer.size();
+            qDebug() << "Ignoring datagram of unexpected size" << buffer.size();
             continue;
         }
 
@@ -145,7 +141,6 @@ void ClientCore::onReadyRead()
 
         emit timeReceived(seconds);
 
-        qDebug() << "Received time:" << seconds << "s from"
-                 << senderAddress.toString() << ":" << senderPort;
+        qDebug() << "Received time:" << seconds << " from" << senderAddress.toString() << ":" << senderPort;
     }
 }

@@ -28,7 +28,6 @@ public:
 signals:
 
     void timeReceived(quint32 secondsFromMidnight);
-
     void dataFreshnessChanged(bool fresh);
 
 private slots:
@@ -37,10 +36,10 @@ private slots:
 private:
     std::unique_ptr<QUdpSocket> m_socket;
     QHostAddress m_serverAddress;
-    quint16      m_serverPort       = 0;
+    quint16 m_serverPort = 0;
     QElapsedTimer m_lastPacketTimer;
-    bool         m_dataFresh        = false;
-    bool         m_running          = false;
+    bool m_dataFresh = false;
+    bool m_running = false;
 };
 
 #endif // CLIENT_CORE_H

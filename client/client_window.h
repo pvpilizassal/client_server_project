@@ -26,7 +26,6 @@ protected:
 private slots:
     void onTimerTick();
     void onTimeReceived(quint32 secondsFromMidnight);
-    void onServerSettingsChanged();
 
 private:
     void setupUi();
@@ -35,21 +34,20 @@ private:
 
     void loadConfig();
     void saveConfig();
-    void applyConfigToUi();
 
     void startCore();
     void restartCore();
 
     void updateServerStatusLabel(bool fresh);
 
-    std::unique_ptr<ClientCore>   m_core;
+    std::unique_ptr<ClientCore> m_core;
     std::unique_ptr<ClientConfig> m_config;
 
-    AnalogClock* m_clock          = nullptr;
-    QLabel*      m_freshnessLabel = nullptr;
-    QLineEdit*   m_addressEdit    = nullptr;
-    QSpinBox*    m_portSpin       = nullptr;
-    QTimer*      m_timer          = nullptr;
+    AnalogClock* m_clock = nullptr;
+    QLabel* m_freshnessLabel = nullptr;
+    QLineEdit* m_addressEdit = nullptr;
+    QSpinBox* m_portSpin = nullptr;
+    QTimer* m_timer = nullptr;
 
     bool m_dataFresh = false;
 };

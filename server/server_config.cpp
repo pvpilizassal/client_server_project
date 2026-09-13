@@ -1,10 +1,6 @@
 #include "server_config.h"
 #include <QDebug>
 
-// инициализация статических констант
-const QString ServerConfig::PORT_KEY = "port";
-const QString ServerConfig::TIME_KEY = "time";
-
 ServerConfig::ServerConfig(const QString& filePath)
     : ConfigBase(filePath)
 {
@@ -92,19 +88,4 @@ void ServerConfig::validateAndFix()
     }
 
     // тут можно проверить, что порт не занят
-}
-
-// хз использовать или нет
-quint16 ServerConfig::fixPort(int value)
-{
-    if (value < 1) value = 1;
-    if (value > 65535) value = 65535;
-    return static_cast<quint16>(value);
-}
-
-quint32 ServerConfig::fixTime(int value)
-{
-    if (value < 0) value = 0;
-    if (value > 86399) value = 86399;
-    return static_cast<quint32>(value);
 }

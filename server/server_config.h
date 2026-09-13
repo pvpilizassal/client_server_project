@@ -7,6 +7,9 @@
 
 class ServerConfig : public ConfigBase
 {
+    static inline const QString PORT_KEY = QStringLiteral("port");
+    static inline const QString TIME_KEY = QStringLiteral("time");
+
 public:
     explicit ServerConfig(const QString& filePath);
 
@@ -30,17 +33,6 @@ protected:
 
     // переопределение метода валидации
     void validateAndFix() override;
-
-private:
-    // ключи для доступа к JSON-полям
-    static const QString PORT_KEY;
-    static const QString TIME_KEY;
-
-    // ?метод для проверки и коррекции порта?
-    static quint16 fixPort(int value);
-
-    // ?метод для проверки и коррекции времени?
-    static quint32 fixTime(int value);
 };
 
 #endif // SERVER_CONFIG_H
