@@ -2,14 +2,13 @@
 #define CLIENT_CONFIG_H
 
 #include "../common/config_base.h"
+#include "../common/protocol.h"
 #include <QHostAddress>
 
 class ClientConfig : public ConfigBase
 {
     static inline const QString ADDRESS_KEY = QStringLiteral("serverAddress");
-    static inline const QString PORT_KEY    = QStringLiteral("serverPort");
-    static inline const QString DEFAULT_ADDRESS = QStringLiteral("127.0.0.1");
-    static inline constexpr quint16 DEFAULT_PORT = 12345;
+    static inline const QString PORT_KEY = QStringLiteral("serverPort");
 
 public:
     explicit ClientConfig(const QString& filePath);

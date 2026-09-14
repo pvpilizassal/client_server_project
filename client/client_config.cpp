@@ -12,7 +12,7 @@ QString ClientConfig::getServerAddress() const
     // если ключ отсутствует или строка пустая, возвращается "127.0.0.1" как fallback
     QString address = m_json.value(ADDRESS_KEY).toString();
     if (address.isEmpty()) {
-        return DEFAULT_ADDRESS;
+        return Protocol::DEFAULT_ADDRESS;
     }
     return address;
 }
@@ -27,7 +27,7 @@ quint16 ClientConfig::getServerPort() const
     int value = m_json.value(PORT_KEY).toInt(0);
     // приведение к допустимому диапазону 1..65535, если значение некорректно – возвращается 12345
     if ((value < 1) || (value > 65535)) {
-        return DEFAULT_PORT;
+        return Protocol::DEFAULT_PORT;
     }
     return static_cast<quint16>(value);
 }
@@ -48,8 +48,8 @@ QString ClientConfig::defaultPath()
 QJsonObject ClientConfig::getDefaults() const
 {
     QJsonObject defaults;
-    defaults[ADDRESS_KEY] = DEFAULT_ADDRESS;
-    defaults[PORT_KEY] = DEFAULT_PORT;
+    defaults[ADDRESS_KEY] = Protocol::DEFAULT_ADDRESS;
+    defaults[PORT_KEY] = Protocol::DEFAULT_PORT;
     return defaults;
 }
 
@@ -60,23 +60,23 @@ void ClientConfig::validateAndFix()
         int port = m_json[PORT_KEY].toInt();
         if ((port < 1) || (port > 65535)) {
             qWarning() << "ClientConfig: serverPort out of range, resetting to 12345";
-            port = DEFAULT_PORT;
+            port = Protocol::DEFAULT_PORT;
         }
         m_json[PORT_KEY] = port;
     } else {
         qWarning() << "ClientConfig: missing 'serverPort' key, setting default";
-        m_json[PORT_KEY] = DEFAULT_PORT;
+        m_json[PORT_KEY] = Protocol::DEFAULT_PORT;
     }
 
     // проверка наличия адреса
     if (!m_json.contains(ADDRESS_KEY)) {
         qWarning() << "ClientConfig: missing 'serverAddress' key, setting default '127.0.0.1'";
-        m_json[ADDRESS_KEY] = DEFAULT_ADDRESS;
+        m_json[ADDRESS_KEY] = Protocol::DEFAULT_ADDRESS;
     } else {
         QString address = m_json[ADDRESS_KEY].toString();
         if (!isValidAddress(address)) {
             qWarning() << "ClientConfig: invalid serverAddress format, resetting to '127.0.0.1'";
-            m_json[ADDRESS_KEY] = DEFAULT_ADDRESS;
+            m_json[ADDRESS_KEY] = Protocol::DEFAULT_ADDRESS;
         }
     }
 }

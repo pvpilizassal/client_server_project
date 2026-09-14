@@ -11,6 +11,7 @@
 namespace Protocol {
     // порт по умолчанию
     inline constexpr quint16 DEFAULT_PORT = 12345;
+    inline const QString DEFAULT_ADDRESS = QStringLiteral("127.0.0.1");
     // команда "жизни" от Клиента
     inline const QString ALIVE_COMMAND = QStringLiteral("ALIVE");
     // интервал инкремента таймера 1 Гц
