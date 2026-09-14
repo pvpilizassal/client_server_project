@@ -24,13 +24,17 @@
 
 ## Запуск
 После клонирования и сборки проекта необходимо загрузить DLL и плагины Qt: 
-- Запустите из **корня папки сборки** (build...-Release) в командной строке команду
-**Windows** "C:\Qt\Tools\CMake_64\bin\cmake.exe" --install . --config Release
+Запустите из **корня папки сборки** (build...-Release) в командной строке команду
+- **Windows** "C:\Qt\Tools\CMake_64\bin\cmake.exe" --install . --config Release
+
 Готовые server.exe, client.exe и все зависимости Qt появятся в папке deploy\bin рядом с папкой проекта
-**Linux** cmake --install build --config Release
+
+- **Linux** cmake --install build --config Release
+
 Готовые server.exe, client.exe и .so-библиотеки окажутся в ./deploy/bin/
+
 Запустите server и client. По умолчанию оба используют порт 12345
-и адрес 127.0.0.1, поэтому на одной машине они найдут друг друга сразу
+и адрес 127.0.0.1, поэтому на одной машине они найдут друг друга сразу.
 Для работы по сети укажите в JSON-профиле «Клиент» IP-адрес машины с сервером
 
 ## Протокол обмена
